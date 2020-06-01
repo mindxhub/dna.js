@@ -7,10 +7,6 @@ class ChainingHashTable {
     this.size = 0
   }
 
-  hash(key) {
-    return key % this.capacity
-  }
-
   insert(value, key) {
     const index = this.hash(key)
     if (!this.arr[index]) {
@@ -41,12 +37,14 @@ class ChainingHashTable {
 
   delete(key) {
     const index = this.hash(key)
+    
+    if (!this.arr[index]) return
     if (this.arr[index] && this.arr[index].length > 1) {
+      
       let cur = this.arr[index].tail
       let count = 0
-      
       while (cur) {
-        if (cur.value.value === key) {
+        if (cur.key === key) {
           let len = this.arr[index].length
           this.arr[index].removeAt(len - count - 1)
           break
@@ -81,59 +79,58 @@ class ChainingHashTable {
     return null
   }
 
+  // private methods
+  hash(key) {
+    return key % this.capacity
+  }
+
   extendCapacity() {
     this.capacity *= 2
-    this.arr = this.clone(this.arr, this.size)
+    const { newArr, length } = this.clone(this.arr, this.size)
+    this.arr = newArr
+    this.size = length
   }
 
   shrinkCapacity() {
     const oldCapacity = this.capacity
     this.capacity /= 2
-    this.arr = this.clone(this.arr, oldCapacity)
+    const { newArr, length } = this.clone(this.arr, oldCapacity)
+    this.arr = newArr
+    this.size = length
   }
 
   clone(arr, size) {
     let newArr = new Array(this.capacity)
+    let length = 0
 
     for (let i = 0; i < size; i++) {
       if (arr[i]) {
-        const linkList = new DoublyLinkedList()
-        let cur = arr[i].head
-        const index = this.hash(arr[i].head.key)
-        
-        while (cur) {
-          linkList.pushBack(cur.value, cur.key)
-          cur = cur.next
-        }
-        newArr[index] = linkList
+        if (arr[i].length > 1) {
+          let cur = arr[i].head
+          while (cur) {
+            const index = this.hash(cur.key)
+            if (newArr[index]) {
+              newArr[index].pushBack(cur.value, cur.key)
+            } else {
+              const linkList = new DoublyLinkedList()
+              linkList.pushBack(cur.value, cur.key)
+              newArr[index] = linkList
+              length++
+            }
+            cur = cur.next
+          }
+        } else {
+          const linkList = new DoublyLinkedList()
+          const item = arr[i].head
+          const index = this.hash(item.key)
+          linkList.pushBack(item.value, item.key)
+          newArr[index] = linkList
+          length++
+        } 
       }
     }
-    return newArr
+    return { newArr, length }
   }
 }
-
-/**
-const HT = new ChainingHashTable()
-HT.insert(10, 3)
-HT.insert(10, 11)
-HT.insert(12, 11)
-HT.insert(11, 10)
-HT.insert(11, 10)
-HT.insert(12, 11)
-HT.insert(12, 13)
-HT.insert(12, 14)
-HT.insert(12, 15)
-HT.insert(12, 16)
-HT.insert(12, 17)
-HT.insert(12, 12)
-
-HT.delete(3)
-HT.delete(11)
-HT.delete(10)
-HT.delete(13)
-HT.delete(14)
-HT.delete(15)
-*/
-
 
 module.exports = { ChainingHashTable }

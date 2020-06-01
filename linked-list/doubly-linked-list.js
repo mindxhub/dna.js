@@ -2,9 +2,9 @@
 <===============Implement Doubly Linked List===============>
 */
 class Node {
-  constructor(value, key) {
+  constructor(value, key = null) {
     this.value = value
-    this.key = key ? key : null
+    this.key = key
     this.next = null
     this.prev = null
   }
