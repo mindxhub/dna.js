@@ -6,6 +6,12 @@
   "scripts": {
     "test": "jest"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn test",
+      "pre-push": ""
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com-personal:nvdai2401/dna.js.git"
@@ -13,6 +19,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "husky": "^4.2.5",
     "jest": "^26.0.1"
-  }
+  },
+  "dependencies": {}
 }

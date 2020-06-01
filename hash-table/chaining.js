@@ -40,7 +40,6 @@ class ChainingHashTable {
     
     if (!this.arr[index]) return
     if (this.arr[index] && this.arr[index].length > 1) {
-      
       let cur = this.arr[index].tail
       let count = 0
       while (cur) {
@@ -104,30 +103,29 @@ class ChainingHashTable {
     let length = 0
 
     for (let i = 0; i < size; i++) {
-      if (arr[i]) {
-        if (arr[i].length > 1) {
-          let cur = arr[i].head
-          while (cur) {
-            const index = this.hash(cur.key)
-            if (newArr[index]) {
-              newArr[index].pushBack(cur.value, cur.key)
-            } else {
-              const linkList = new DoublyLinkedList()
-              linkList.pushBack(cur.value, cur.key)
-              newArr[index] = linkList
-              length++
-            }
-            cur = cur.next
+      if (!arr[i]) continue
+      if (arr[i].length > 1) {
+        let cur = arr[i].head
+        while (cur) {
+          const index = this.hash(cur.key)
+          if (newArr[index]) {
+            newArr[index].pushBack(cur.value, cur.key)
+          } else {
+            const linkList = new DoublyLinkedList()
+            linkList.pushBack(cur.value, cur.key)
+            newArr[index] = linkList
+            length++
           }
-        } else {
-          const linkList = new DoublyLinkedList()
-          const item = arr[i].head
-          const index = this.hash(item.key)
-          linkList.pushBack(item.value, item.key)
-          newArr[index] = linkList
-          length++
-        } 
-      }
+          cur = cur.next
+        }
+      } else {
+        const linkList = new DoublyLinkedList()
+        const item = arr[i].head
+        const index = this.hash(item.key)
+        linkList.pushBack(item.value, item.key)
+        newArr[index] = linkList
+        length++
+      } 
     }
     return { newArr, length }
   }
