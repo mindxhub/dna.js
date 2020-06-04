@@ -4,6 +4,7 @@
 class Node {
   constructor(value, key) {
     this.value = value
+    // key property is used for implementing hash table using chaining technique
     this.key = key ? key : null
     this.next = null
     this.prev = null
@@ -44,6 +45,7 @@ class DoublyLinkedList {
   }
 
   // pushFront(item): Add a node with value to the front of list.
+  // don't need pass key param to this function if you don't need it
   pushFront(value, key) {
     const newNode = new Node(value, key)
     if (this.length === 0) {
@@ -119,7 +121,7 @@ class DoublyLinkedList {
   // insert(value, index): Insert a node with value at given index.
   insert(value, index) {
     if (index < 0 || index > this.length) return null
-    else if (index === 0) {
+    if (index === 0) {
       return this.pushFront(value)
     } else if (index === this.length) {
       return this.pushBack(value)
@@ -150,7 +152,7 @@ class DoublyLinkedList {
   // removeAt(index): Remove node at given index.
   removeAt(index) {
     if (!this.length || index < 0 || index >= this.length) return null
-    else if (index === 0) {
+    if (index === 0) {
       return this.popFront()
     } else if (index === this.length - 1) {
       return this.popBack()
@@ -199,4 +201,4 @@ class DoublyLinkedList {
   }
 }
 
-module.exports ={ Node, DoublyLinkedList }
+module.exports = { Node, DoublyLinkedList }
