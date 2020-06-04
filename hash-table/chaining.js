@@ -1,6 +1,10 @@
 const { Node, DoublyLinkedList } = require('../linked-list/doubly-linked-list')
 
 const DEFAULT_CAPACITY = 8
+const UPPER_LOAD_FACTOR = 1
+const LOWER_LOAD_FACTOR = 0.25
+const GROW_SHRINK_FACTOR = 2
+
 class ChainingHashTable {
   constructor() {
     this.arr = new Array(DEFAULT_CAPACITY)
@@ -8,15 +12,15 @@ class ChainingHashTable {
     this.size = 0
   }
 
-  insert(value, key) {
-    const index = this.hash(key)
+  insert(key, value) {
+    const index = this.__hash(key)
     if (!this.arr[index]) {
       const linkList = new DoublyLinkedList()
       linkList.pushFront(value, key)
       this.arr[index] = linkList
       this.size++
-      if (this.size === this.capacity) {
-        this.grow()
+      if (this.__getGrowShrinkFactor() >= UPPER_LOAD_FACTOR) {
+        this.__grow()
       }
       return
     }
@@ -37,14 +41,14 @@ class ChainingHashTable {
   }
 
   delete(key) {
-    const index = this.hash(key)
+    const index = this.__hash(key)
     
     if (!this.arr[index]) return
     if (this.arr[index].length === 1) {
       this.arr[index] = undefined
       this.size--
-      if (this.capacity > DEFAULT_CAPACITY && this.size <= Math.floor(this.capacity / 4)) {
-        this.shrink()
+      if (this.__getGrowShrinkFactor() <= LOWER_LOAD_FACTOR && this.capacity > DEFAULT_CAPACITY) {
+        this.__shrink()
       }
       return
     }
@@ -64,7 +68,7 @@ class ChainingHashTable {
 
   search(key) {
     if (!this.size) return null
-    const index = this.hash(key)
+    const index = this.__hash(key)
     
     if (!this.arr[index]) {
       return null
@@ -80,67 +84,46 @@ class ChainingHashTable {
   }
 
   // private methods
-  hash(key) {
+  __hash(key) {
     return key % this.capacity
   }
 
-  grow() {
-    this.capacity *= 2
-    let { newArr, length } = this.clone(this.arr, this.size)
-    if (length === this.capacity) {
-      do {
-        this.capacity *= 2
-        const res = this.clone(this.arr, this.size)
-        length = res.length
-        if (length < this.capacity) {
-          newArr = res.newArr
-        }
-      } while (length < this.capacity)
-    }
-    this.arr = newArr
-    this.size = length
+  __grow() {
+    const newCapacity = this.capacity * GROW_SHRINK_FACTOR
+    this.__rehash(newCapacity)
   }
 
-  shrink() {
+  __shrink() {
+    const newCapacity = this.capacity / GROW_SHRINK_FACTOR
+    this.__rehash(newCapacity)
+  }
+
+  __rehash(newCapacity) {
     const oldCapacity = this.capacity
-    this.capacity /= 2
-    const { newArr, length } = this.clone(this.arr, oldCapacity)
-    this.arr = newArr
-    this.size = length
-  }
+    const oldArr = this.arr
 
-  clone(arr, size) {
-    let newArr = new Array(this.capacity)
-    let length = 0
+    this.capacity = newCapacity
+    this.arr = new Array(this.capacity)
+    this.size = 0
 
-    for (let i = 0; i < size; i++) {
-      if (!arr[i]) continue
-      if (arr[i].length === 1) {
-        const linkList = new DoublyLinkedList()
-        const item = arr[i].head
-        const index = this.hash(item.key)
-        linkList.pushBack(item.value, item.key)
-        newArr[index] = linkList
-        length++
-      } else {
-        let cur = arr[i].head
+    for (let i = 0; i < oldCapacity; i++) {
+      if (oldArr[i] && oldArr[i].length === 1) {
+        this.insert(oldArr[i].head.key, oldArr[i].head.value)
+      }
+
+      if (oldArr[i] && oldArr[i].length > 1) {
+        let cur = oldArr[i].head
         while (cur) {
-          if (length === this.capacity) return { newArr, length }
-          const index = this.hash(cur.key)
-          if (newArr[index]) {
-            newArr[index].pushBack(cur.value, cur.key)
-            continue
-          }
-          const linkList = new DoublyLinkedList()
-          linkList.pushBack(cur.value, cur.key)
-          newArr[index] = linkList
-          length++
+          this.insert(cur.key, cur.value)
           cur = cur.next
         }
-      } 
+        
+      }
     }
+  }
 
-    return { newArr, length }
+  __getGrowShrinkFactor() {
+    return this.size / this.capacity
   }
 }
 

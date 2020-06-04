@@ -3,8 +3,8 @@ const { ChainingHashTable } = require('../chaining.js')
 let chainingHashTable
 
 const insertMultipleItems = (items) => {
-  items.forEach(({ value, key }) => {
-    chainingHashTable.insert(value, key)
+  items.forEach(({ key, value}) => {
+    chainingHashTable.insert(key, value)
   })
 }
 
@@ -22,12 +22,13 @@ describe('Doubly linked list', () => {
   describe('insert', () => {
     it('should insert a item correctly', () => {
       expect(chainingHashTable.size).toBe(0)
-      chainingHashTable.insert(100, 1)
+      chainingHashTable.insert(1, 100)
+   
       expect(chainingHashTable.size).toBe(1)
       expect(chainingHashTable.arr[1].valueAt(0)).toBe(100)
 
       // when insert an element (100, 9) is exist in HT at index 9 % 8 = 1 % 8 = 1
-      chainingHashTable.insert(101, 9)
+      chainingHashTable.insert(9, 101)
       expect(chainingHashTable.arr[1].valueAt(1)).toBe(101)
     })
 
@@ -51,7 +52,7 @@ describe('Doubly linked list', () => {
   describe('delete', () => {
     it('should delete an item which its length is 1 correctly', () => {
       expect(chainingHashTable.size).toBe(0)
-      chainingHashTable.insert(100, 0)
+      chainingHashTable.insert(0, 100)
       expect(chainingHashTable.size).toBe(1)
       chainingHashTable.delete(0)
       expect(chainingHashTable.size).toBe(0)
@@ -59,8 +60,8 @@ describe('Doubly linked list', () => {
 
     it('should delete an item which its length is more than 1 correctly', () => {
       expect(chainingHashTable.size).toBe(0)
-      chainingHashTable.insert(100, 0)
-      chainingHashTable.insert(108, 8)
+      chainingHashTable.insert(0, 100)
+      chainingHashTable.insert(8, 108)
       expect(chainingHashTable.size).toBe(1)
       chainingHashTable.delete(0)
       expect(chainingHashTable.arr[0].length).toBe(1)
@@ -89,17 +90,16 @@ describe('Doubly linked list', () => {
   describe('search', () => {
     it('should return value with valid key correctly', () => {
       const item = { key: 1, value: 100}
-      chainingHashTable.insert(item.value, item.key)
+      chainingHashTable.insert(item.key, item.value)
       expect(chainingHashTable.search(item.key)).toBe(item.value)
     })
     it('should not return value invalid correctly', () => {
-      const item = { key: 1, value: 100}
+      const item = { key: 1, value: 100 }
       const invalidKey = 2
       
       expect(chainingHashTable.search(item.key)).toBeFalsy()
-      chainingHashTable.insert(item.value, item.key)
+      chainingHashTable.insert(item.key, item.value)
       expect(chainingHashTable.search(invalidKey)).toBeFalsy()
     })
   })
-
 });
