@@ -4,10 +4,10 @@ const LOWER_LOAD_FACTOR = 0.25
 const GROW_SHRINK_FACTOR = 2
 
 class Node {
-  constructor(key, value, deleted = false) {
+  constructor(key, value) {
     this.key = key
     this.value = value
-    this.deleted = deleted
+    this.deleted = false
   }
 }
 
@@ -48,7 +48,7 @@ class OpenAddressingHT {
   
     this.arr[index].deleted = true
     this.size--
-    if (this.__getGrowShrinkFactor() <= LOWER_LOAD_FACTOR) {
+    if (this.__getGrowShrinkFactor() <= LOWER_LOAD_FACTOR && this.capacity > DEFAULT_CAPACITY) {
       this.__shrink()
     }
   }
@@ -81,7 +81,7 @@ class OpenAddressingHT {
 
   __rehash(newCapacity) {
     const oldCapacity = this.capacity
-    const oldArr = [...this.arr]
+    const oldArr = this.arr
     
     this.capacity = newCapacity
     this.arr = new Array(this.capacity)
@@ -111,19 +111,8 @@ class OpenAddressingHT {
   }
 
   __nearestPrime(k) {
-    for (let i = k - 1; i >= 2; i--) {
-      if (this.__isPrime(i)) return i
-    }
+    return k - 1
   }
-
-  __isPrime(k) {
-    if (k <= 1) return false
-    for (let i = 2; i <= Math.trunc(k / 2); i++) {
-      if (k % i === 0) return false
-    }
-    return true
-  }
-  
 }
 
 module.exports = { OpenAddressingHT }
